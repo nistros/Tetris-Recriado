@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: black;
+    background-color: rgb(21, 20, 20);
     text-align: center;
 }
 
@@ -15,13 +15,13 @@ body {
     vertical-align: top;
     margin: 0 20 20 20;
     padding: 20;
-    border: solid 1px white;
+    border: solid 1px rgb(255, 255, 255);
     width: 286px;
     height: 572.325px;
 }
 
 #logo {
-    width: 160px;
+    width: 200px;
     margin-bottom: 15px;
 }
 
@@ -40,7 +40,7 @@ body {
 
 #score-div,
 #lines-div {
-    color: white;
+    color: rgb(255, 255, 255);
     font-size: 23px;
     font-weight: bold;
     font-family: "Lucida Console", "Courier New", monospace;

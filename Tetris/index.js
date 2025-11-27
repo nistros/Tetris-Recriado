@@ -208,26 +208,44 @@ window.onload = () => {
 
         setTimeout(draw, delay);
     }
+// Move
+window.onkeydown = event => {
+    switch (event.key) {
 
-    // Move
-    window.onkeydown = event => {
-        switch (event.key) {
-            case "ArrowLeft":
-                if (!tetromino.collides(i => ({ x: tetromino.x[i] - 1, y: tetromino.y[i] })))
-                    tetromino.update(i => --tetromino.x[i]);
-                break;
-            case "ArrowRight":
-                if (!tetromino.collides(i => ({ x: tetromino.x[i] + 1, y: tetromino.y[i] })))
-                    tetromino.update(i => ++tetromino.x[i]);
-                break;
-            case "ArrowDown":
-                delay = Tetromino.DELAY / Tetromino.DELAY_INCREASED;
-                break;
-            case " ":
-                tetromino.rotate();
-                break;
-        }
+        // 🔹 Mover para ESQUERDA
+        case "ArrowLeft":
+            if (!tetromino.collides(i => ({ x: tetromino.x[i] - 1, y: tetromino.y[i] })))
+                tetromino.update(i => --tetromino.x[i]);
+            break;
+
+        // 🔹 Mover para DIREITA
+        case "ArrowRight":
+            if (!tetromino.collides(i => ({ x: tetromino.x[i] + 1, y: tetromino.y[i] })))
+                tetromino.update(i => ++tetromino.x[i]);
+            break;
+
+        // 🔹 Descer rápido (soft drop)
+        case "ArrowDown":
+            delay = Tetromino.DELAY / Tetromino.DELAY_INCREASED;
+            break;
+
+        // 🔹 ROTACIONAR (ArrowUp)
+        case "ArrowUp":
+            tetromino.rotate();
+            break;
+
+        // 🔹 HARD DROP (Space) — cair até colidir
+        case " ":
+            while (!tetromino.collides(i => ({ 
+                x: tetromino.x[i], 
+                y: tetromino.y[i] + 1 
+            }))) {
+                tetromino.update(i => ++tetromino.y[i]);
+            }
+            break;
     }
+};
+
     window.onkeyup = event => {
         if (event.key === "ArrowDown")
             delay = Tetromino.DELAY;
