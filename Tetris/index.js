@@ -43,7 +43,6 @@ window.onload = () => {
                 this.img.onload = () => this.draw();
                 return;
             }
-            // Print the current tetromine
             for (let i = 0; i < this.length; ++i) {
                 ctx.drawImage(
                     this.img,
@@ -79,10 +78,10 @@ window.onload = () => {
                 ny = [];
 
             if (!this.collides(i => {
-                    nx.push(maxX + minY - tetromino.y[i]);
-                    ny.push(tetromino.x[i] - minX + minY);
-                    return { x: nx[i], y: ny[i] };
-                })) {
+                nx.push(maxX + minY - this.y[i]);
+                ny.push(this.x[i] - minX + minY);
+                return { x: nx[i], y: ny[i] };
+            })) {
                 this.update(i => {
                     this.x[i] = nx[i];
                     this.y[i] = ny[i];
@@ -111,22 +110,26 @@ window.onload = () => {
         score,
         lines;
 
+    // ==========================
+    // FEVER MODE VARIABLES
+    // ==========================
+    let feverBar = 0;         // 0 a 100
+    let feverActive = false;  // está em modo FEVER?
+    let feverDecayTimer = 0;  // tempo sem completar linhas
+    let combo = 0;            // combo de linhas seguidas
 
 
     (function setup() {
-
         canvas.style.top = Tetromino.BLOCK_SIZE;
         canvas.style.left = Tetromino.BLOCK_SIZE;
 
         ctx.canvas.width = FIELD_WIDTH * Tetromino.BLOCK_SIZE;
         ctx.canvas.height = FIELD_HEIGHT * Tetromino.BLOCK_SIZE;
 
-        // Scale background
         const scale = Tetromino.BLOCK_SIZE / 13.83333333333;
         background.style.width = scale * 166;
         background.style.height = scale * 304;
 
-        // Offset each block to the middle of the table width
         const middle = Math.floor(FIELD_WIDTH / 2);
         for (const t of TETROMINOES) t.x = t.x.map(x => x + middle);
 
@@ -135,7 +138,6 @@ window.onload = () => {
     })();
 
     function reset() {
-        // Make false all blocks
         FIELD.forEach((_, y) => FIELD[y] = Array.from({ length: FIELD_WIDTH }).map(_ => false));
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -143,59 +145,99 @@ window.onload = () => {
         delay = Tetromino.DELAY;
         score = 0;
         lines = 0;
+
+        // Reset fever system
+        feverBar = 0;
+        feverActive = false;
+        feverDecayTimer = 0;
+        combo = 0;
     }
 
     function draw() {
+
         if (tetromino) {
 
-            // Collision?
+            // colisão vertical?
             if (tetromino.collides(i => ({ x: tetromino.x[i], y: tetromino.y[i] + 1 }))) {
+
                 tetromino.merge();
-                // Prepare for new tetromino
                 tetromino = null;
 
-                // Check for completed rows
+                // checar linhas completas
                 let completedRows = 0;
-                for (let y = FIELD_HEIGHT - 1; y >= MIN_VALID_ROW; --y)
+
+                for (let y = FIELD_HEIGHT - 1; y >= MIN_VALID_ROW; --y) {
                     if (FIELD[y].every(e => e !== false)) {
+
                         for (let ay = y; ay >= MIN_VALID_ROW; --ay)
                             FIELD[ay] = [...FIELD[ay - 1]];
 
-                        ++completedRows;
-                        // Keep the same row
-                        ++y;
+                        completedRows++;
+                        y++;
                     }
+                }
 
+                // ===============================
+                // FEVER MODE PROCESSAMENTO
+                // ===============================
                 if (completedRows) {
-                    // Print againt the table
+
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    for (let y = MIN_VALID_ROW; y < FIELD_HEIGHT; ++y) {
-                        for (let x = 0; x < FIELD_WIDTH; ++x) {
-                            if (FIELD[y][x] !== false) new Tetromino([x], [y], FIELD[y][x]).draw();
-                        }
+                    for (let y = MIN_VALID_ROW; y < FIELD_HEIGHT; ++y)
+                        for (let x = 0; x < FIELD_WIDTH; ++x)
+                            if (FIELD[y][x] !== false)
+                                new Tetromino([x], [y], FIELD[y][x]).draw();
+
+                    const baseScore = [40, 100, 300, 1200][completedRows - 1];
+
+                    combo++;
+
+                    feverBar += completedRows * 15 + combo * 5;
+                    if (feverBar > 100) feverBar = 100;
+
+                    if (feverBar >= 100) feverActive = true;
+
+                    const feverMult = feverActive
+                        ? 2 + feverBar / 100
+                        : 1 + feverBar / 200;
+
+                    score += Math.floor(baseScore * feverMult);
+
+                    lines += completedRows;
+
+                    feverDecayTimer = 0;
+
+                } else {
+
+                    combo = 0;
+
+                    feverDecayTimer++;
+
+                    if (feverDecayTimer > 30) {
+
+                        feverBar -= 2;
+                        if (feverBar < 0) feverBar = 0;
+
+                        if (feverBar === 0) feverActive = false;
+
+                        feverDecayTimer = 0;
                     }
 
-                    score += [40, 100, 300, 1200][completedRows - 1];
-                    lines += completedRows;
-                } else {
-                    // Check if player has lost
                     if (FIELD[MIN_VALID_ROW - 1].some(block => block !== false)) {
                         alert("You have lost!");
                         reset();
                     }
                 }
 
-
-            } else
+            } else {
                 tetromino.update(i => ++tetromino.y[i]);
-        }
-        // No tetromino failing
-        else {
+            }
+
+        } else {
 
             scoreLbl.innerText = score;
             linesLbl.innerText = lines;
 
-            // Create random tetromino
             tetromino = (({ x, y }, color) =>
                 new Tetromino([...x], [...y], color)
             )(
@@ -206,49 +248,51 @@ window.onload = () => {
             tetromino.draw();
         }
 
+        // ===========================
+        // VELOCIDADE DINÂMICA DA FEVER
+        // ===========================
+        delay = Tetromino.DELAY / (1 + feverBar / 40);
+
         setTimeout(draw, delay);
     }
-// Move
-window.onkeydown = event => {
-    switch (event.key) {
 
-        // 🔹 Mover para ESQUERDA
-        case "ArrowLeft":
-            if (!tetromino.collides(i => ({ x: tetromino.x[i] - 1, y: tetromino.y[i] })))
-                tetromino.update(i => --tetromino.x[i]);
-            break;
+    // =====================
+    // CONTROLES DO JOGADOR
+    // =====================
+    window.onkeydown = event => {
+        switch (event.key) {
 
-        // 🔹 Mover para DIREITA
-        case "ArrowRight":
-            if (!tetromino.collides(i => ({ x: tetromino.x[i] + 1, y: tetromino.y[i] })))
-                tetromino.update(i => ++tetromino.x[i]);
-            break;
+            case "ArrowLeft":
+                if (!tetromino.collides(i => ({ x: tetromino.x[i] - 1, y: tetromino.y[i] })))
+                    tetromino.update(i => --tetromino.x[i]);
+                break;
 
-        // 🔹 Descer rápido (soft drop)
-        case "ArrowDown":
-            delay = Tetromino.DELAY / Tetromino.DELAY_INCREASED;
-            break;
+            case "ArrowRight":
+                if (!tetromino.collides(i => ({ x: tetromino.x[i] + 1, y: tetromino.y[i] })))
+                    tetromino.update(i => ++tetromino.x[i]);
+                break;
 
-        // 🔹 ROTACIONAR (ArrowUp)
-        case "ArrowUp":
-            tetromino.rotate();
-            break;
+            case "ArrowDown":
+                delay = Tetromino.DELAY / Tetromino.DELAY_INCREASED;
+                break;
 
-        // 🔹 HARD DROP (Space) — cair até colidir
-        case " ":
-            while (!tetromino.collides(i => ({ 
-                x: tetromino.x[i], 
-                y: tetromino.y[i] + 1 
-            }))) {
-                tetromino.update(i => ++tetromino.y[i]);
-            }
-            break;
-    }
-};
+            case "ArrowUp":
+                tetromino.rotate();
+                break;
+
+            case " ":
+                while (!tetromino.collides(i => ({
+                    x: tetromino.x[i],
+                    y: tetromino.y[i] + 1
+                }))) {
+                    tetromino.update(i => ++tetromino.y[i]);
+                }
+                break;
+        }
+    };
 
     window.onkeyup = event => {
         if (event.key === "ArrowDown")
             delay = Tetromino.DELAY;
-    }
-
-}
+    };
+};
