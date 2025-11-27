@@ -4,7 +4,6 @@ window.onload = () => {
         scoreLbl = document.getElementById("score"),
         linesLbl = document.getElementById("lines"),
         feverBarFill = document.getElementById("fever-bar-fill"),
-        gameContainer = document.getElementById("game-container"),
         canvas = document.getElementById("game-canvas"),
         ctx = canvas.getContext("2d");
 
@@ -108,7 +107,6 @@ window.onload = () => {
         ];
 
     let tetromino = null,
-        baseDelay,
         delay,
         score,
         lines;
@@ -145,8 +143,7 @@ window.onload = () => {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        baseDelay = Tetromino.DELAY;
-        delay = baseDelay;
+        delay = Tetromino.DELAY;
         score = 0;
         lines = 0;
 
@@ -154,14 +151,6 @@ window.onload = () => {
         feverActive = false;
         feverMultiplier = 1;
         piecesSinceLastLine = 0;
-    }
-
-    function shakeScreen() {
-        if (gameContainer.classList.contains("shake")) return;
-        gameContainer.classList.add("shake");
-        setTimeout(() => {
-            gameContainer.classList.remove("shake");
-        }, 300);
     }
 
     function draw() {
@@ -186,11 +175,11 @@ window.onload = () => {
                 }
 
                 if (completedRows) {
-                    // Shake screen ao fechar linha
-                    shakeScreen();
-
+                    // Reset error count
                     piecesSinceLastLine = 0;
-                    feverBar = Math.min(100, feverBar + completedRows * 50);
+
+                    // Increase fever bar
+                    feverBar = Math.min(100, feverBar + completedRows * 25);
 
                     if (feverBar >= 100 && !feverActive) {
                         feverActive = true;
@@ -198,13 +187,11 @@ window.onload = () => {
                         setTimeout(() => document.body.classList.remove("flash"), 600);
                     }
 
-                    feverMultiplier = feverActive ? 3 : 1;
+                    feverMultiplier = feverActive ? 2 : 1;
 
+                    // Increase score
                     score += ([40, 100, 300, 1200][completedRows - 1]) * feverMultiplier;
                     lines += completedRows;
-
-                    // Acelera o delay a cada nova peça (mais rápido)
-                    baseDelay = Math.max(70, baseDelay - 10);
 
                     // Redraw field
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -214,10 +201,11 @@ window.onload = () => {
                                 new Tetromino([x], [y], FIELD[y][x]).draw();
 
                 } else {
+                    // No lines completed: increment errors
                     piecesSinceLastLine++;
 
                     if (piecesSinceLastLine >= 5) {
-                        feverBar = Math.max(0, feverBar - 30);
+                        feverBar = Math.max(0, feverBar - 20);
                         piecesSinceLastLine = 0;
 
                         if (feverBar <= 0) {
@@ -226,6 +214,7 @@ window.onload = () => {
                         }
                     }
 
+                    // Check for game over
                     if (FIELD[MIN_VALID_ROW - 1].some(block => block !== false)) {
                         alert("You have lost!");
                         reset();
@@ -235,15 +224,16 @@ window.onload = () => {
             } else {
                 tetromino.update(i => ++tetromino.y[i]);
             }
-        } else {
+        }
+        // No active tetromino: create new one
+        else {
             scoreLbl.innerText = score;
             linesLbl.innerText = lines;
 
+            // Update fever bar UI
             feverBarFill.style.width = feverBar + "%";
 
-            // Atualiza delay para acelerar progressivamente
-            delay = baseDelay;
-
+            // Create random tetromino
             tetromino = (({ x, y }, color) =>
                 new Tetromino([...x], [...y], color)
             )(
@@ -260,28 +250,31 @@ window.onload = () => {
     // Move controls
     window.onkeydown = event => {
         switch (event.key) {
+
+            // Move left
             case "ArrowLeft":
                 if (!tetromino.collides(i => ({ x: tetromino.x[i] - 1, y: tetromino.y[i] })))
                     tetromino.update(i => --tetromino.x[i]);
                 break;
 
+            // Move right
             case "ArrowRight":
                 if (!tetromino.collides(i => ({ x: tetromino.x[i] + 1, y: tetromino.y[i] })))
                     tetromino.update(i => ++tetromino.x[i]);
                 break;
 
+            // Soft drop (faster down)
             case "ArrowDown":
-                delay = baseDelay / Tetromino.DELAY_INCREASED;
+                delay = Tetromino.DELAY / Tetromino.DELAY_INCREASED;
                 break;
 
+            // Rotate piece
             case "ArrowUp":
                 tetromino.rotate();
                 break;
 
+            // Hard drop (space) — drop immediately
             case " ":
-                // Hard drop: tremida e cair rápido
-                shakeScreen();
-
                 while (!tetromino.collides(i => ({
                     x: tetromino.x[i],
                     y: tetromino.y[i] + 1
@@ -294,6 +287,6 @@ window.onload = () => {
 
     window.onkeyup = event => {
         if (event.key === "ArrowDown")
-            delay = baseDelay;
-    };
+            delay = Tetromino.DELAY;
+    }
 };

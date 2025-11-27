@@ -47,3 +47,25 @@ body {
     text-align: left;
     margin: 15 0;
 }
+/* Tremida da tela */
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translate(-8px, 0) rotate(-3deg); }
+    20%, 40%, 60%, 80% { transform: translate(8px, 0) rotate(3deg); }
+  }
+  
+  .shake {
+    animation: shake 0.35s ease;
+  }
+  
+  /* A animação flash já estava, mantenha ela */
+  .flash {
+    animation: feverFlash 0.5s ease-in-out 3;
+  }
+  
+  @keyframes feverFlash {
+    0%   { background-color: rgba(255, 0, 0, 0.3); }
+    50%  { background-color: rgba(255, 255, 0, 0.3); }
+    100% { background-color: rgba(255, 0, 0, 0.3); }
+  }
+  

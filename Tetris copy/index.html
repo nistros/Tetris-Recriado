@@ -1,0 +1,39 @@
+<html>
+<head>
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" type="image/x-icon" href="resources/logo.ico">
+    <title>Tetris Effect</title>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="left-div">
+            <img src="resources/tetriseffect.jpg" id="logo">
+            <hr>
+
+            <div id="score-div">
+                <label> Score: </label>
+                <label id="score">0</label>
+            </div>
+
+            <div id="lines-div">
+                <label> Lines: </label>
+                <label id="lines">0</label>
+            </div>
+
+            <div id="fever-container">
+                <label>Fever:</label>
+                <div id="fever-bar-bg">
+                    <div id="fever-bar-fill"></div>
+                </div>
+            </div>
+
+        </div>
+        <div id="game-container">
+            <img src="resources/background.png" id="background">
+            <canvas id="game-canvas"></canvas>
+        </div>
+    </div>
+</body>
+
+<script src="index.js"></script>
+</html>

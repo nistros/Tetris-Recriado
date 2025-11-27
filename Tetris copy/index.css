@@ -1,0 +1,87 @@
+/* Fonte retrô arcade */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(21, 20, 20);
+    text-align: center;
+}
+
+#wrapper {
+    display: inline-block;
+    margin: 20px;
+}
+
+#left-div {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 20 20 20;
+    padding: 20px;
+    border: solid 1px rgb(255, 255, 255);
+    width: 286px;
+    height: 572.325px;
+}
+
+#logo {
+    width: 200px;
+    margin-bottom: 15px;
+}
+
+#game-container {
+    position: relative;
+    display: inline-block;
+}
+
+#background {
+    z-index: -1;
+}
+
+#game-canvas {
+    position: absolute;
+}
+
+/* Score, Lines, Fever container - fonte retrô */
+#score-div,
+#lines-div,
+#fever-container {
+    color: white;
+    font-size: 18px;
+    font-family: 'Press Start 2P', monospace;
+    text-align: left;
+    margin-top: 20px;
+}
+
+/* Fever HUD */
+#fever-container {
+    width: 100%;
+    margin-top: 25px;
+}
+
+#fever-bar-bg {
+    width: 100%;
+    height: 20px;
+    background-color: rgb(40, 40, 40);
+    border: 2px solid white;
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+#fever-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff6600, #ff0000);
+    transition: width 0.2s, background 0.3s;
+}
+
+/* Tela piscando quando fever ativa */
+.flash {
+    animation: feverFlash 0.5s ease-in-out 3;
+}
+
+@keyframes feverFlash {
+    0%   { background-color: rgba(255, 0, 0, 0.3); }
+    50%  { background-color: rgba(255, 255, 0, 0.3); }
+    100% { background-color: rgba(255, 0, 0, 0.3); }
+}
