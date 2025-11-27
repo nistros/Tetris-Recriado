@@ -8,7 +8,7 @@ window.onload = () => {
     // =============================
     // LISTA DE CARAS DOS AMIGOS
     // =============================
-    const FACE_IMAGES = ["face1.jpg", "face2.jpg", "face3.jpg", "face4.jpg", "face5.jpg", "face6.jpg", "face7.jpg"];
+    const FACE_IMAGES = ["face1.jpg", "face2.jpg", "face3.jpg", "face4.jpg", "face5.jpg", "face6.jpg", "face7,jpg"];
 
 
     // Pré-carrega as imagens
