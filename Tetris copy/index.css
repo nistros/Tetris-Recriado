@@ -20,7 +20,7 @@ body {
     padding: 20px;
     border: solid 1px rgb(255, 255, 255);
     width: 286px;
-    height: 572.325px;
+    height: 620px;
 }
 
 #logo {
@@ -41,7 +41,6 @@ body {
     position: absolute;
 }
 
-/* Score, Lines, Fever container - fonte retrô */
 #score-div,
 #lines-div,
 #fever-container {
@@ -52,7 +51,7 @@ body {
     margin-top: 20px;
 }
 
-/* Fever HUD */
+/* HUD FEVER */
 #fever-container {
     width: 100%;
     margin-top: 25px;
@@ -75,7 +74,21 @@ body {
     transition: width 0.2s, background 0.3s;
 }
 
-/* Tela piscando quando fever ativa */
+/* HOLD HUD */
+#hold-div {
+    color: white;
+    font-size: 18px;
+    font-family: 'Press Start 2P', monospace;
+    text-align: left;
+    margin-top: 25px;
+}
+
+#hold-canvas {
+    background-color: rgb(30, 30, 30);
+    border: 2px solid white;
+    margin-top: 10px;
+}
+
 .flash {
     animation: feverFlash 0.5s ease-in-out 3;
 }
