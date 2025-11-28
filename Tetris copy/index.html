@@ -28,11 +28,6 @@
                 </div>
             </div>
 
-            <div id="hold-div">
-                <label>Hold:</label>
-                <canvas id="hold-canvas" width="120" height="120"></canvas>
-            </div>
-
         </div>
 
         <div id="game-container">
@@ -41,6 +36,16 @@
         </div>
 
     </div>
+
+    <!-- GAME OVER OVERLAY -->
+    <div id="game-over-screen" class="hidden">
+        <div id="game-over-box">
+            <h1>GAME OVER</h1>
+            <p id="final-score">Score: 0</p>
+            <button id="restart-btn">Restart</button>
+        </div>
+    </div>
+
 </body>
 <script src="index.js"></script>
 </html>

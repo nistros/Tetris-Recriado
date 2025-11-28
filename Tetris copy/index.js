@@ -4,10 +4,12 @@ window.onload = () => {
         scoreLbl = document.getElementById("score"),
         linesLbl = document.getElementById("lines"),
         feverBarFill = document.getElementById("fever-bar-fill"),
-        holdCanvas = document.getElementById("hold-canvas"),
-        holdCtx = holdCanvas.getContext("2d"),
         canvas = document.getElementById("game-canvas"),
-        ctx = canvas.getContext("2d");
+        ctx = canvas.getContext("2d"),
+
+        gameOverScreen = document.getElementById("game-over-screen"),
+        finalScoreLbl = document.getElementById("final-score"),
+        restartBtn = document.getElementById("restart-btn");
 
     class Tetromino {
         static COLORS = ["blue", "green", "yellow", "red", "orange", "light-blue", "purple"];
@@ -113,13 +115,13 @@ window.onload = () => {
         FIELD = Array.from({ length: FIELD_HEIGHT }),
         MIN_VALID_ROW = 4,
         TETROMINOES = [
-            new Tetromino([0, 0, 0, 0], [0, 1, 2, 3]), // I
-            new Tetromino([0, 0, 1, 1], [0, 1, 0, 1]), // O
-            new Tetromino([0, 1, 1, 1], [0, 0, 1, 2]), // J
-            new Tetromino([0, 0, 0, 1], [0, 1, 2, 0]), // L
-            new Tetromino([0, 1, 1, 2], [0, 0, 1, 1]), // S
-            new Tetromino([0, 1, 1, 2], [1, 1, 0, 1]), // Z
-            new Tetromino([0, 1, 1, 2], [1, 1, 0, 0])  // T
+            new Tetromino([0, 0, 0, 0], [0, 1, 2, 3]),
+            new Tetromino([0, 0, 1, 1], [0, 1, 0, 1]),
+            new Tetromino([0, 1, 1, 1], [0, 0, 1, 2]),
+            new Tetromino([0, 0, 0, 1], [0, 1, 2, 0]),
+            new Tetromino([0, 1, 1, 2], [0, 0, 1, 1]),
+            new Tetromino([0, 1, 1, 2], [1, 1, 0, 1]),
+            new Tetromino([0, 1, 1, 2], [1, 1, 0, 0])
         ];
 
     let tetromino = null,
@@ -127,15 +129,11 @@ window.onload = () => {
         score,
         lines;
 
-    // FEVER
+    // FEVER SYSTEM
     let feverBar = 0;
     let feverActive = false;
     let feverMultiplier = 1;
     let piecesSinceLastLine = 0;
-
-    // HOLD SYSTEM
-    let holdPiece = null; // guarda Tetromino real
-    let canHold = true;
 
     // RANDOMIZER 7-BAG
     let bag = [];
@@ -158,43 +156,6 @@ window.onload = () => {
         const piece = new Tetromino([...base.x], [...base.y], color);
         piece.resetPosition();
         return piece;
-    }
-
-    // DRAW HOLD HUD
-    function drawHoldPiece() {
-        holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
-        if (!holdPiece) return;
-
-        const p = holdPiece.clone();
-        const size = Tetromino.BLOCK_SIZE;
-
-        for (let i = 0; i < p.x.length; i++) {
-            holdCtx.fillStyle = "#ffffff";
-            holdCtx.fillRect(
-                (p.x[i] - 3) * size + 60,
-                (p.y[i]) * size + 20,
-                size,
-                size
-            );
-        }
-    }
-
-    // HOLD ACTION
-    function hold() {
-        if (!tetromino || !canHold) return;
-
-        if (!holdPiece) {
-            holdPiece = tetromino.clone();
-            tetromino = spawnNewTetromino();
-        } else {
-            const temp = holdPiece.clone();
-            holdPiece = tetromino.clone();
-            tetromino = temp;
-            tetromino.resetPosition();
-        }
-
-        drawHoldPiece();
-        canHold = false;
     }
 
     // SETUP
@@ -228,11 +189,20 @@ window.onload = () => {
         feverMultiplier = 1;
         piecesSinceLastLine = 0;
 
-        holdPiece = null;
-        canHold = true;
-
-        drawHoldPiece();
+        tetromino = null;
     }
+
+    // GAME OVER SCREEN
+    function gameOver() {
+        finalScoreLbl.innerText = "Score: " + score;
+        gameOverScreen.classList.remove("hidden");
+        tetromino = null; 
+    }
+
+    restartBtn.onclick = () => {
+        gameOverScreen.classList.add("hidden");
+        reset();
+    };
 
     // MAIN GAME LOOP
     function draw() {
@@ -289,8 +259,8 @@ window.onload = () => {
                     }
 
                     if (FIELD[MIN_VALID_ROW - 1].some(block => block !== false)) {
-                        alert("You have lost!");
-                        reset();
+                        gameOver();
+                        return;
                     }
                 }
 
@@ -304,16 +274,13 @@ window.onload = () => {
             feverBarFill.style.width = feverBar + "%";
 
             tetromino = spawnNewTetromino();
-            canHold = true;
-
             tetromino.draw();
-            drawHoldPiece();
         }
 
         setTimeout(draw, delay);
     }
 
-    // CONTROLES
+    // CONTROLES — sem HOLD
     window.onkeydown = event => {
         switch (event.key) {
             case "ArrowLeft":
@@ -341,11 +308,6 @@ window.onload = () => {
                 }))) {
                     tetromino.update(i => ++tetromino.y[i]);
                 }
-                break;
-
-            case "c":
-            case "C":
-                hold();
                 break;
         }
     };

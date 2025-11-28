@@ -74,21 +74,6 @@ body {
     transition: width 0.2s, background 0.3s;
 }
 
-/* HOLD HUD */
-#hold-div {
-    color: white;
-    font-size: 18px;
-    font-family: 'Press Start 2P', monospace;
-    text-align: left;
-    margin-top: 25px;
-}
-
-#hold-canvas {
-    background-color: rgb(30, 30, 30);
-    border: 2px solid white;
-    margin-top: 10px;
-}
-
 .flash {
     animation: feverFlash 0.5s ease-in-out 3;
 }
@@ -97,4 +82,50 @@ body {
     0%   { background-color: rgba(255, 0, 0, 0.3); }
     50%  { background-color: rgba(255, 255, 0, 0.3); }
     100% { background-color: rgba(255, 0, 0, 0.3); }
+}
+
+/* GAME OVER SCREEN */
+
+#game-over-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#game-over-screen.hidden {
+    display: none;
+}
+
+#game-over-box {
+    background: black;
+    border: 3px solid white;
+    padding: 40px;
+    text-align: center;
+    color: white;
+    font-family: 'Press Start 2P', monospace;
+}
+
+#game-over-box h1 {
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+#restart-btn {
+    margin-top: 30px;
+    padding: 15px 30px;
+    background: white;
+    border: none;
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
+}
+
+#restart-btn:hover {
+    background: rgb(200,200,200);
 }
