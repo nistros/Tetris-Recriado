@@ -108,7 +108,7 @@ window.onload = () => {
         }
     }
 
-    // FIELD
+  
     const
         FIELD_WIDTH = 10,
         FIELD_HEIGHT = 20,
@@ -129,13 +129,13 @@ window.onload = () => {
         score,
         lines;
 
-    // FEVER SYSTEM
+ 
     let feverBar = 0;
     let feverActive = false;
     let feverMultiplier = 1;
     let piecesSinceLastLine = 0;
 
-    // RANDOMIZER 7-BAG
+  
     let bag = [];
 
     function nextFromBag() {
@@ -192,19 +192,21 @@ window.onload = () => {
         tetromino = null;
     }
 
-    // GAME OVER SCREEN
+   
     function gameOver() {
         finalScoreLbl.innerText = "Score: " + score;
         gameOverScreen.classList.remove("hidden");
         tetromino = null; 
     }
 
+    
     restartBtn.onclick = () => {
         gameOverScreen.classList.add("hidden");
         reset();
+        draw(); 
     };
 
-    // MAIN GAME LOOP
+    
     function draw() {
         if (tetromino) {
 
@@ -280,7 +282,7 @@ window.onload = () => {
         setTimeout(draw, delay);
     }
 
-    // CONTROLES — sem HOLD
+   
     window.onkeydown = event => {
         switch (event.key) {
             case "ArrowLeft":
